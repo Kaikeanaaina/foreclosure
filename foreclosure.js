@@ -1,9 +1,9 @@
 'use strict';
 
-var steve ;
-var stevesLoan ;
-var month = 0 ;
-var monthsUntilEvicted ;
+var steve;
+var stevesLoan;
+var month = 0;
+var monthsUntilEvicted;
 function loan()  {
   var account = {
     borrowed : 550000,
@@ -16,7 +16,7 @@ function loan()  {
 
   function missPayment() {
     account.defaulted++;
-    while (account.defaulted >= account.defaultsToForeclose)  {
+    if (account.defaulted >= account.defaultsToForeclose)  { //this greater than might the issue
       account.foreclosed = true;
     }
   }
@@ -42,10 +42,7 @@ function loan()  {
     }
 
   };
-
 }
-
-stevesLoan = loan();
 
 function borrower(loan) {
   var account = {
@@ -60,11 +57,12 @@ function borrower(loan) {
     },
 
     makePayment : function() {
-      if (account.funds > loan.monthlyPayment) {
-        account.funds -= loan.monthlyPayment;
-        loan.receivePayment(loan.monthlyPayment);
+
+      if (account.funds > loan.getMonthlyPayment()) {
+        account.funds -= loan.getMonthlyPayment();
+        loan.receivePayment(loan.getMonthlyPayment());
       } else {
-        loan().receivePayment(account.funds);
+        loan.receivePayment(account.funds);
         account.funds = 0;
       }
     },
@@ -79,8 +77,11 @@ stevesLoan = loan();
 
 steve = borrower(stevesLoan);
 
-while (stevesLoan !== loan().isForeclosed) {
-  borrower(steve).payDay();
-  borrower(steve).makePayment();
+while (stevesLoan.isForeclosed() === false) {
+
+  steve.payDay();
+  steve.makePayment();
   month++;
 }
+
+monthsUntilEvicted = month;
